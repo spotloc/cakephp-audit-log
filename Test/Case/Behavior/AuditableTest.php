@@ -34,7 +34,6 @@ class Author extends CakeTestModel {
 /**
  * AuditableBehavior test class.
  *
- *
  */
 class AuditableBehaviorTest extends CakeTestCase {
 
