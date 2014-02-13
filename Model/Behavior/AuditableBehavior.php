@@ -1,314 +1,283 @@
 <?php
 
+App::uses('Hash', 'Utility');
+App::uses('Model', 'Model');
+App::uses('ModelBehavior', 'Model');
+
 /**
  * Records changes made to an object during save operations.
  */
 class AuditableBehavior extends ModelBehavior {
-  /**
-   * A copy of the object as it existed prior to the save. We're going
-   * to store this off so we can calculate the deltas after save.
-   *
-   * @var   Object
-   */
-  private $_original = array();
 
-  /**
-   * Initiate behavior for the model using specified settings.
-   *
-   * Available settings:
-   *   - ignore array, optional
-   *            An array of property names to be ignored when records
-   *            are created in the deltas table.
-   *   - habtm  array, optional
-   *            An array of models that have a HABTM relationship with
-   *            the acting model and whose changes should be monitored
-   *            with the model.
-   *
-   * @param   Model  $Model      Model using the behavior
-   * @param   array   $settings   Settings overrides.
-   */
-  public function setup( Model $Model, $settings = array() ) {
-    if( !isset( $this->settings[$Model->alias] ) ) {
-      $this->settings[$Model->alias] = array(
-        'ignore' => array( 'created', 'updated', 'modified' ),
-        'habtm'  => count( $Model->hasAndBelongsToMany ) > 0
-          ? array_keys( $Model->hasAndBelongsToMany )
-          : array()
-      );
-    }
-    if( !is_array( $settings ) ) {
-      $settings = array();
-    }
-    $this->settings[$Model->alias] = array_merge_recursive( $this->settings[$Model->alias], $settings );
+/**
+ * A copy of the object as it existed prior to the save. We're going
+ * to store this off so we can calculate the deltas after save.
+ *
+ * @var array
+ */
+	protected $_original = [];
 
-    /*
-     * Ensure that no HABTM models which are already auditable
-     * snuck into the settings array. That would be bad. Same for
-     * any model which isn't a HABTM association.
-     */
-    foreach( $this->settings[$Model->alias]['habtm'] as $index => $model_name ) {
-      /**
-       * Note the "===" in the condition. The type check is important,
-       * so don't change it just because it may look like a mistake.
-       */
-      if( !array_key_exists( $model_name, $Model->hasAndBelongsToMany ) || ( is_array($Model->$model_name->actsAs) && array_search( 'Auditable', $Model->$model_name->actsAs ) === true ) ) {
-        unset( $this->settings[$Model->alias]['habtm'][$index] );
-      }
-    }
-  }
+/**
+ * Initiate behavior for the model using specified settings.
+ *
+ * Available settings:
+ *   - ignore array, optional
+ *            An array of property names to be ignored when records
+ *            are created in the deltas table.
+ *   - habtm  array, optional
+ *            An array of models that have a HABTM relationship with
+ *            the acting model and whose changes should be monitored
+ *            with the model.
+ *
+ * @param   Model  $model      Model using the behavior
+ * @param   array   $settings   Settings overrides.
+ */
+	public function setup(Model $model, $settings = []) {
+		if (empty($this->settings[$model->alias])) {
+			$this->settings[$model->alias] = [
+				'ignore' => ['created', 'updated', 'modified'],
+				'habtm'  => []
+			];
+		}
 
-  /**
-   * Executed before a save() operation.
-   *
-   * @return  boolean
-   */
-  public function beforeSave( Model $Model, $options = array() ) {
-    # If we're editing an existing object, save off a copy of
-    # the object as it exists before any changes.
-    if( !empty( $Model->id ) ) {
-      $this->_original[$Model->alias] = $this->_getModelData( $Model );
-    }
-    
-    return true;
-  }
-  
-  /**
-   * Executed before a delete() operation.
-   *
-   * @param 	$Model
-   * @return	boolean
-   */
-  public function beforeDelete( Model $Model, $cascade = true ) {
-    $original = $Model->find(
-      'first',
-      array(
-        'contain'    => false,
-        'conditions' => array( $Model->alias . '.' . $Model->primaryKey => $Model->id ),
-      )
-    );
-    $this->_original[$Model->alias] = $original[$Model->alias];
-    
-    return true;
-  }
+		if (!is_array($settings)) {
+			$settings = [];
+		}
 
-  /**
-   * function afterSave
-   * Executed after a save operation completes.
-   *
-   * @param   $created  Boolean. True if the save operation was an
-   *                    insertion. False otherwise.
-   * @return  void
-   */
-  public function afterSave( Model $Model, $created , $options = array() ) {
-    $audit = array( $Model->alias => $this->_getModelData( $Model ) );
-    $audit[$Model->alias][$Model->primaryKey] = $Model->id;
+		$this->settings[$model->alias] = array_merge_recursive($this->settings[$model->alias], $settings);
 
-    /*
-     * Create a runtime association with the Audit model and bind the
-     * Audit model to its AuditDelta model.
-     */
-    $Model->bindModel(
-      array( 'hasMany' => array( 'Audit' ) )
-    );
-    $Model->Audit->bindModel(
-      array( 'hasMany' => array( 'AuditDelta' ) )
-    );
-    
-    /*
-     * If a currentUser() method exists in the model class (or, of
-     * course, in a superclass) the call that method to pull all user
-     * data. Assume than an id field exists.
-     */
-    $source = array();
-    if ( $Model->hasMethod( 'currentUser' ) ) {
-      $source = $Model->currentUser();
-    } else if ( $Model->hasMethod( 'current_user' ) ) {
-      $source = $Model->current_user();
-    }
-    
-    $data = array(
-      'Audit' => array(
-        'event'     => $created ? 'CREATE' : 'EDIT',
-        'model'     => $Model->alias,
-        'entity_id' => $Model->id,
-        'json_object' => json_encode( $audit ),
-        'source_id' => isset( $source['id'] ) ? $source['id'] : null,
-        'description' => isset( $source['description'] ) ? $source['description'] : null,
-      )
-    );
+		/*
+		 * Ensure that no HABTM models which are already auditable
+		 * snuck into the settings array. That would be bad. Same for
+		 * any model which isn't a HABTM association.
+		 */
+		foreach ($this->settings[$model->alias]['habtm'] as $index => $modelName) {
+			if (array_key_exists($modelName, $model->hasAndBelongsToMany)) {
+				continue;
+			}
 
-    /*
-     * We have the audit_logs record, so let's collect the set of
-     * records that we'll insert into the audit_log_deltas table.
-     */
-    $updates = array();
-    foreach( $audit[$Model->alias] as $property => $value ) {
-      $delta = array();
+			if (!is_array($model->{$modelName}->actsAs)) {
+				continue;
+			}
 
-      /*
-       * Ignore virtual fields (Cake 1.3+) and specified properties
-       */
-      if( ( $Model->hasMethod( 'isVirtualField' ) && $Model->isVirtualField( $property ) )
-          || in_array( $property, $this->settings[$Model->alias]['ignore'] )  ) {
-        continue;
-      }
+			if (array_search('Auditable', $model->{$modelName}->actsAs) === false) {
+				unset($this->settings[$model->alias]['habtm'][$index]);
+			}
+		}
+	}
 
-      if( !$created ) {
-        if( array_key_exists( $property, $this->_original[$Model->alias] ) && $this->_original[$Model->alias][$property] != $value ) {
-          /*
-           * If the property exists in the original _and_ the
-           * value is different, store it.
-           */
-          $delta = array(
-            'AuditDelta' => array(
-              'property_name' => $property,
-              'old_value'     => $this->_original[$Model->alias][$property],
-              'new_value'     => $value
-            )
-          );
-          array_push( $updates, $delta );
-        }
-      }
-    }
+/**
+ * Executed before a save() operation.
+ *
+ * @param Model $model
+ * @param array $options
+ * @return boolean
+ */
+	public function beforeSave(Model $model, $options = []) {
+		if (!empty($model->id)) {
+			$this->_original[$model->alias] = $this->_getModelData($model);
+		}
 
-    # Insert an audit record if a new model record is being created
-    # or if something we care about actually changed.
-    if( $created || count( $updates ) ) {
-      $Model->Audit->create();
-      $Model->Audit->save( $data );
+		return true;
+	}
 
-      if( $created ) {
-        if( $Model->hasMethod( 'afterAuditCreate' ) ) {
-          $Model->afterAuditCreate( $Model );
-        }
-      }
-      else {
-        if( $Model->hasMethod( 'afterAuditUpdate' ) ) {
-          $Model->afterAuditUpdate( $Model, $this->_original, $updates, $Model->Audit->id );
-        }
-      }
-    }
-    
-    # Insert a delta record if something changed.
-    if( count( $updates ) ) {
-      foreach( $updates as $delta ) {
-        $delta['AuditDelta']['audit_id'] = $Model->Audit->id;
+/**
+ * Executed before a delete() operation.
+ *
+ * @param 	Model 	$model
+ * @param  	boolean $cascade
+ * @return	boolean
+ */
+	public function beforeDelete(Model $model, $cascade = true) {
+		$original = $model->find('first', [
+			'contain'    => false,
+			'conditions' => [$model->escapeField() => $model->getID()],
+		]);
 
-        $Model->Audit->AuditDelta->create();
-        $Model->Audit->AuditDelta->save( $delta );
+		$this->_original[$model->alias] = $original[$model->alias];
+		return true;
+	}
 
-        if( !$created && $Model->hasMethod( 'afterAuditProperty' ) ) {
-          $Model->afterAuditProperty(
-            $Model,
-            $delta['AuditDelta']['property_name'],
-            $this->_original[$Model->alias][$delta['AuditDelta']['property_name']],
-            $delta['AuditDelta']['new_value']
-          );
-        }
-      }
-    }
+/**
+ * Executed after a save operation completes.
+ *
+ * @param  	Model 	$model
+ * @param   boolean $created
+ * @param   array   $options
+ * @return  void
+ */
+	public function afterSave(Model $model, $created, $options = []) {
+		$audit = [$model->alias => $this->_getModelData($model)];
+		$audit[$model->alias][$model->primaryKey] = $model->id;
 
-    /*
-     * Destroy the runtime association with the Audit
-     */
-    $Model->unbindModel(
-      array( 'hasMany' => array( 'Audit' ) )
-    );
+		$source = $this->_getSource($model);
 
-    /*
-     * Unset the original object value so it's ready for the next
-     * call.
-     */
-    if( isset( $this->_original ) ) {
-      unset( $this->_original[$Model->alias] );
-    }
-    return true;    
-  }
-  
-  /**
-   * Executed after a model is deleted.
-   *
-   * @param 	$Model
-   * @return	void
-   */
-  public function afterDelete( Model $Model ) {
-    /*
-     * If a currentUser() method exists in the model class (or, of
-     * course, in a superclass) the call that method to pull all user
-     * data. Assume than an id field exists.
-     */
-    $source = array();
-    if( $Model->hasMethod( 'currentUser' ) ) {
-      $source = $Model->currentUser();
-    } else if ( $Model->hasMethod( 'current_user' ) ) {
-      $source = $Model->current_user();
-    }
-    
-    $audit = array( $Model->alias => $this->_original[$Model->alias] );
-    $data  = array(
-      'Audit' => array(
-        'event'       => 'DELETE',
-        'model'       => $Model->alias,
-        'entity_id'   => $Model->id,
-        'json_object' => json_encode( $audit ),
-        'source_id'   => isset( $source['id'] ) ? $source['id'] : null,
-        'description' => isset( $source['description'] ) ? $source['description'] : null,
-      )
-    );
-    
-    $this->Audit = ClassRegistry::init( 'Audit' );
-    $this->Audit->create();
-    $this->Audit->save( $data );
-  }
+		$data = [
+			'Audit' => [
+				'event'     	=> $created ? 'CREATE' : 'EDIT',
+				'model'     	=> $model->alias,
+				'entity_id' 	=> $model->id,
+				'json_object' => json_encode($audit),
+				'source_id' 	=> isset($source['id']) 				 ? $source['id'] 					: null,
+				'description' => isset($source['description']) ? $source['description'] : null,
+			]
+		];
 
-  /**
-   * function _getModelData
-   * Retrieves the entire set model data contained to the primary
-   * object and any/all HABTM associated data that has been configured
-   * with the behavior.
-   *
-   * Additionally, for the HABTM data, all we care about is the IDs,
-   * so the data will be reduced to an indexed array of those IDs.
-   *
-   * @param   $Model
-   * @return  array
-   */
-  private function _getModelData( Model $Model ) {
-    /*
-     * Retrieve the model data along with its appropriate HABTM
-     * model data.
-     */
-    $data = $Model->find(
-      'first',
-      array(
-        'contain' => !empty( $this->settings[$Model->alias]['habtm'] )
-          ? array_values( $this->settings[$Model->alias]['habtm'] )
-          : array(),
-        'conditions' => array( $Model->alias . '.' . $Model->primaryKey => $Model->id )
-      )
-    );
+		$updates = [];
+		foreach ($audit[$model->alias] as $property => $value) {
+			// Don't create delta for new records
+			if ($created) {
+				continue;
+			}
 
-    $audit_data = array(
-      $Model->alias => isset($data[$Model->alias]) ? $data[$Model->alias] : array()
-    );
+			// Don't create delta for virtual fields
+			if ($model->hasMethod('isVirtualField') && $model->isVirtualField($property)) {
+				continue;
+			}
 
-    foreach( $this->settings[$Model->alias]['habtm'] as $habtm_model ) {
-      if( array_key_exists( $habtm_model, $Model->hasAndBelongsToMany ) && isset( $data[$habtm_model] ) ) {
-        $habtm_ids = Set::combine(
-          $data[$habtm_model],
-          '{n}.id',
-          '{n}.id'
-        );
-        /*
-         * Grab just the id values and sort those
-         */
-        $habtm_ids = array_values( $habtm_ids );
-        sort( $habtm_ids );
+			// Don't create fields for those that are ignored
+			if (in_array($property, $this->settings[$model->alias]['ignore'])) {
+				continue;
+			}
 
-        $audit_data[$Model->alias][$habtm_model] = implode( ',', $habtm_ids );
-      }
-    }
+			// Don't create delta for new values
+			if (!array_key_exists($property, $this->_original[$model->alias])) {
+				continue;
+			}
 
-    return $audit_data[$Model->alias];
-  }
+			// Don't create delta for unchanged values
+			if ($this->_original[$model->alias][$property] == $value) {
+				continue;
+			}
+
+			$delta = [
+				'AuditDelta' => [
+					'property_name' => $property,
+					'old_value'     => $this->_original[$model->alias][$property],
+					'new_value'     => $value
+				]
+			];
+
+			array_push($updates, $delta);
+		}
+
+		$audit = ClassRegistry::init('AuditLog.Audit');
+		if ($created || count($updates)) {
+			$audit->create();
+			$audit->save($data);
+
+			if ($created && $model->hasMethod('afterAuditCreate')) {
+				$model->afterAuditCreate($model);
+			}
+
+			if (!$created && $model->hasMethod('afterAuditUpdate')) {
+				$model->afterAuditUpdate($model, $this->_original, $updates, $audit->id);
+			}
+		}
+
+		foreach ($updates as $delta) {
+			$delta['AuditDelta']['audit_id'] = $audit->id;
+
+			$audit->AuditDelta->create();
+			$audit->AuditDelta->save($delta);
+
+			if (!$created && $model->hasMethod('afterAuditProperty')) {
+				$model->afterAuditProperty(
+					$model,
+					$delta['AuditDelta']['property_name'],
+					$this->_original[$model->alias][$delta['AuditDelta']['property_name']],
+					$delta['AuditDelta']['new_value']
+				);
+			}
+		}
+
+		if (!empty($this->_original[$model->alias])) {
+			unset($this->_original[$model->alias]);
+		}
+
+		return true;
+	}
+
+/**
+ * Executed after a model is deleted.
+ *
+ * @param 	Model $model
+ * @return	void
+ */
+	public function afterDelete(Model $model) {
+		$source = $this->_getSource($model);
+		$audit = [$model->alias => $this->_original[$model->alias]];
+
+		$data  = [
+			'Audit' => [
+				'event'       => 'DELETE',
+				'model'       => $model->alias,
+				'entity_id'   => $model->id,
+				'json_object' => json_encode($audit),
+				'source_id'   => isset($source['id']) 				 ? $source['id'] 					: null,
+				'description' => isset($source['description']) ? $source['description'] : null
+			]
+		];
+
+		$audit = ClassRegistry::init('AuditLog.Audit');
+		$audit->create();
+		$audit->save($data);
+	}
+
+/**
+ * Get the source for the actor CRUD'ing the resource
+ *
+ * @param  Model  $model
+ * @return array
+ */
+	protected function _getSource(Model $model) {
+		if ($model->hasMethod('currentUser')) {
+			return $model->currentUser();
+		}
+
+		if ($model->hasMethod('current_user')) {
+			return $model->current_user();
+		}
+
+		return [];
+	}
+
+/**
+ * Retrieves the entire set model data contained to the primary
+ * object and any/all HABTM associated data that has been configured
+ * with the behavior.
+ *
+ * Additionally, for the HABTM data, all we care about is the IDs,
+ * so the data will be reduced to an indexed array of those IDs.
+ *
+ * @param   Model $model
+ * @return  array
+ */
+	protected function _getModelData(Model $model) {
+		$data = $model->find('first', [
+			'contain' 		=> !empty($this->settings[$model->alias]['habtm']) ? array_values($this->settings[$model->alias]['habtm']) : [],
+			'conditions' 	=> [$model->alias . '.' . $model->primaryKey => $model->id],
+		]);
+
+		$audit_data = [
+			$model->alias => isset($data[$model->alias]) ? $data[$model->alias] : []
+		];
+
+		foreach ($this->settings[$model->alias]['habtm'] as $habtmModel) {
+			if (!array_key_exists($habtmModel, $model->hasAndBelongsToMany)) {
+				continue;
+			}
+
+			if (!isset($data[$habtmModel])) {
+				continue;
+			}
+
+			$ids = Hash::get($data[$habtmModel], '{n}.id');
+			sort($ids);
+			$audit_data[$model->alias][$habtmModel] = implode(',', $ids);
+		}
+
+		return $audit_data[$model->alias];
+	}
+
 }
