@@ -18,7 +18,7 @@
       "name":"Christian Winther",
       "role":"Author",
       "homepage":"http://cakephp.nu/"
-    },
+    }
   ],
   "support":{
     "source":"https://github.com/jippi/cakephp-audit-log",
