@@ -26,7 +26,26 @@ class AuditDelta extends Model {
 					'value' => 'source_id'
 				]
 			],
-			'audit_id' 			=> ['type' => 'value'],
+			'model' => [
+				'type' 	=> 'value',
+				'field' => 'Audit.model',
+				'model' => 'Audit',
+				'fields' => [
+					'id' => 'model',
+					'label' => 'model',
+					'value' => 'model'
+				]
+			],
+			'entity_id' => [
+				'type' 	=> 'value',
+				'field' => 'Audit.entity_id',
+				'model' => 'Audit',
+				'fields' => [
+					'id' => 'entity_id',
+					'label' => 'entity_id',
+					'value' => 'entity_id'
+				]
+			],
 			'property_name' => ['type' => 'value'],
 			'old_value' 		=> ['type' => 'value'],
 			'new_value' 		=> ['type' => 'value'],
