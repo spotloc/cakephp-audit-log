@@ -26,7 +26,9 @@
     "irc":"irc://irc.freenode.org/friendsofcake"
   },
   "require":{
-    "composer/installers":"*"
+    "composer/installers":"*",
+    "cakedc/search":"*",
+    "friendsofcake/crud":"3.*"
   },
   "extra": {
     "installer-name": "AuditLog"
