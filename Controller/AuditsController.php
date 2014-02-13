@@ -20,11 +20,10 @@ class AuditsController extends AuditLogAppController {
 	public function admin_index() {
 		$this->Crud->on('beforePaginate', function($event) {
 			if ($model = $this->request->query('model')) {
-				$this->Audit->bindModel(['hasOne' => [$model => ['foreignKey' => 'id']]]);
+				$Instance = ClassRegistry::init($model);
 
-				$displayField = $this->Audit->{$model}->displayField;
+				$displayField = $Instance->displayField;
 
-				$this->Paginator->settings['contain'] = $model;
 				$this->Paginator->settings['fields'] = [
 					'Audit.id',
 					'Audit.event',
@@ -36,6 +35,16 @@ class AuditsController extends AuditLogAppController {
 					'Audit.delta_count',
 					$model . '.' . $displayField
 				];
+
+				$this->Paginator->settings['joins'][] = [
+					'alias' => $model,
+					'table' => $Instance->useTable,
+					'conditions' => [
+						$Instance->alias . '.id = Audit.entity_id'
+					],
+					'type' => 'INNER'
+				];
+
 				$this->set(compact('model', 'displayField'));
 			}
 		});
