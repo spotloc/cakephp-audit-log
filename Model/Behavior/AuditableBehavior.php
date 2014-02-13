@@ -28,6 +28,9 @@ class AuditableBehavior extends ModelBehavior {
  *            An array of models that have a HABTM relationship with
  *            the acting model and whose changes should be monitored
  *            with the model.
+ *   - on     array, optional
+ *   					events to audit on, can be either/any of
+ *   					'create' 'update' or 'delete'
  *
  * @param   Model  $model      Model using the behavior
  * @param   array   $settings   Settings overrides.
@@ -35,6 +38,7 @@ class AuditableBehavior extends ModelBehavior {
 	public function setup(Model $model, $settings = []) {
 		if (empty($this->settings[$model->alias])) {
 			$this->settings[$model->alias] = [
+				'on' 		 => ['delete', 'create', 'update'],
 				'ignore' => ['created', 'updated', 'modified'],
 				'habtm'  => []
 			];
@@ -44,7 +48,7 @@ class AuditableBehavior extends ModelBehavior {
 			$settings = [];
 		}
 
-		$this->settings[$model->alias] = array_merge_recursive($this->settings[$model->alias], $settings);
+		$this->settings[$model->alias] = array_merge($this->settings[$model->alias], $settings);
 
 		/*
 		 * Ensure that no HABTM models which are already auditable
@@ -74,6 +78,10 @@ class AuditableBehavior extends ModelBehavior {
  * @return boolean
  */
 	public function beforeSave(Model $model, $options = []) {
+		if (!$this->_shouldProcess('create', $model) && !$this->_shouldProcess('update', $model)) {
+			return;
+		}
+
 		if (!empty($model->id)) {
 			$this->_original[$model->alias] = $this->_getModelData($model);
 		}
@@ -89,6 +97,10 @@ class AuditableBehavior extends ModelBehavior {
  * @return	boolean
  */
 	public function beforeDelete(Model $model, $cascade = true) {
+		if (!$this->_shouldProcess('delete', $model)) {
+			return;
+		}
+
 		$original = $model->find('first', [
 			'contain'    => false,
 			'conditions' => [$model->escapeField() => $model->getID()],
@@ -107,6 +119,14 @@ class AuditableBehavior extends ModelBehavior {
  * @return  void
  */
 	public function afterSave(Model $model, $created, $options = []) {
+		if ($created && !$this->_shouldProcess('create', $model)) {
+			return;
+		}
+
+		if (!$created && !$this->_shouldProcess('update', $model)) {
+			return;
+		}
+
 		$audit = [$model->alias => $this->_getModelData($model)];
 		$audit[$model->alias][$model->primaryKey] = $model->id;
 
@@ -205,6 +225,10 @@ class AuditableBehavior extends ModelBehavior {
  * @return	void
  */
 	public function afterDelete(Model $model) {
+		if (!$this->_shouldProcess('delete', $model)) {
+			return;
+		}
+
 		$source = $this->_getSource($model);
 		$audit = [$model->alias => $this->_original[$model->alias]];
 
@@ -222,6 +246,17 @@ class AuditableBehavior extends ModelBehavior {
 		$audit = ClassRegistry::init('AuditLog.Audit');
 		$audit->create();
 		$audit->save($data);
+	}
+
+/**
+ * Should a model event be processed by AuditLog ?
+ *
+ * @param  string $event
+ * @param  Model $model
+ * @return boolean
+ */
+	protected function _shouldProcess($event, Model $model) {
+		return in_array($event, $this->settings[$model->alias]['on']);
 	}
 
 /**
@@ -272,7 +307,7 @@ class AuditableBehavior extends ModelBehavior {
 				continue;
 			}
 
-			$ids = Hash::get($data[$habtmModel], '{n}.id');
+			$ids = Hash::extract($data[$habtmModel], '{n}.id');
 			sort($ids);
 			$audit_data[$model->alias][$habtmModel] = implode(',', $ids);
 		}
