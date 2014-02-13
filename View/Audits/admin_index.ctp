@@ -9,11 +9,10 @@
 		<thead>
 		<tr>
 			<th><?= $this->Paginator->sort('event');?></th>
-			<th><?= $this->Paginator->sort('model');?></th>
-			<th><?= $this->Paginator->sort('entity_id');?></th>
-			<th><?= $this->Paginator->sort('description');?></th>
-			<th><?= $this->Paginator->sort('source_id');?></th>
-			<th><?= $this->Paginator->sort('delta_count');?></th>
+			<th><?= $this->Paginator->sort('source_id', 'By');?></th>
+			<th><?= $this->Paginator->sort('model', 'Resource');?></th>
+			<th><?= $this->Paginator->sort('entity_id', 'Identifier');?></th>
+			<th><?= $this->Paginator->sort('delta_count', 'Changes');?></th>
 			<th><?= $this->Paginator->sort('created');?></th>
 			<th class="actions"><?= __('Actions');?></th>
 		</tr>
@@ -22,10 +21,16 @@
 	<?php foreach ($items as $item): ?>
 		<tr>
 			<td class='center'><?= h($item['Audit']['event']); ?>&nbsp;</td>
-			<td class='center'><?= $this->Html->link($item['Audit']['model'], ['action' => 'index', '?' => ['model' => $item['Audit']['model']]]); ?></td>
-			<td class='center'><?= $this->Html->link($item['Audit']['entity_id'], ['action' => 'index', '?' => ['model' => $item['Audit']['model'], 'entity_id' => $item['Audit']['entity_id']]]); ?></td>
-			<td class='center'><?= h($item['Audit']['description']); ?>&nbsp;</td>
 			<td class='center'><?= $this->Html->link($item['Audit']['source_id'], ['action' => 'index', '?' => ['source_id' => $item['Audit']['source_id']]]); ?>&nbsp;</td>
+			<td class='center'><?= $this->Html->link($item['Audit']['model'], ['action' => 'index', '?' => ['model' => $item['Audit']['model']]]); ?></td>
+			<td class='center'>
+				<?php
+				$name = isset($model) ? $item[$model][$displayField] : $item['Audit']['entity_id'];
+				$name = $this->Text->truncate($name, 50);
+
+				echo $this->Html->link($name, ['action' => 'index', '?' => ['model' => $item['Audit']['model'], 'entity_id' => $item['Audit']['entity_id']]]);
+				?>
+			</td>
 			<td class='center'><?= h($item['Audit']['delta_count']); ?>&nbsp;</td>
 			<td class="center"><span title="<?= h($item['Audit']['created']); ?>"><?= str_replace('on', '', $this->Time->timeAgoInWords($item['Audit']['created'])); ?></span></td>
 			<td class="actions center">

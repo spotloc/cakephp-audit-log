@@ -11,6 +11,9 @@ class AuditDelta extends Model {
 		]
 	];
 
+	public $actsAs = ['Containable'];
+
+	public $recursive = -1;
 
 	public function setupSearchPlugin() {
 		$this->order = 'AuditDelta.property_name';

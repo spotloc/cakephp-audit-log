@@ -10,6 +10,10 @@ class Audit extends Model {
 		]
 	];
 
+	public $actsAs = ['Containable'];
+
+	public $recursive = -1;
+
 	public function setupSearchPlugin() {
 		$this->order = 'Audit.created DESC';
 

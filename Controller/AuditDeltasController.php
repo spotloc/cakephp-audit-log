@@ -10,6 +10,7 @@ class AuditDeltasController extends AuditLogAppController {
 
 	public function beforeFilter() {
 		parent::beforeFilter();
+
 		$this->AuditDelta->setupSearchPlugin();
 
 		$this->Crud->on('beforeLookup', function($event) {
@@ -17,6 +18,21 @@ class AuditDeltasController extends AuditLogAppController {
 				$this->Paginator->settings['group'] = 'property_name';
 			}
 		});
+
+		$this->Paginator->settings['contain'] = [
+			'Audit' => [
+				'fields' => [
+					'Audit.id',
+					'Audit.event',
+					'Audit.model',
+					'Audit.entity_id',
+					'Audit.description',
+					'Audit.source_id',
+					'Audit.created',
+					'Audit.delta_count'
+				]
+			]
+		];
 
 	}
 

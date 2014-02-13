@@ -92,8 +92,8 @@
 				<?php foreach ($item['AuditDelta'] as $it) : ?>
 					<tr>
 						<td><?= $it['property_name'];?></td>
-						<td><?= $it['old_value'] ?: 'N/A';?></td>
-						<td><?= $it['new_value']; ?></td>
+						<td><?= $this->Text->truncate($it['old_value'], 50) ?: 'N/A'; ?></td>
+						<td><?= $this->Text->truncate($it['new_value'], 50) ?: 'N/A'; ?></td>
 					</tr>
 				<?php endforeach; ?>
 				</tbody>
