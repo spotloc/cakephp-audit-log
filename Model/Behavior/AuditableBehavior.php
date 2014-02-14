@@ -134,12 +134,14 @@ class AuditableBehavior extends ModelBehavior {
 
 		$data = [
 			'Audit' => [
-				'event'     	=> $created ? 'CREATE' : 'EDIT',
-				'model'     	=> $model->alias,
-				'entity_id' 	=> $model->id,
+				'event' => $created ? 'CREATE' : 'EDIT',
+				'model' => $model->alias,
+				'entity_id' => $model->id,
 				'json_object' => json_encode($audit),
-				'source_id' 	=> isset($source['id']) 				 ? $source['id'] 					: null,
-				'description' => isset($source['description']) ? $source['description'] : null,
+				'source_id' => $source['id'],
+				'source_ip' => $source['ip'],
+				'source_url' => $source['url'],
+				'description' => $source['description']
 			]
 		];
 
@@ -234,12 +236,14 @@ class AuditableBehavior extends ModelBehavior {
 
 		$data  = [
 			'Audit' => [
-				'event'       => 'DELETE',
-				'model'       => $model->alias,
-				'entity_id'   => $model->id,
+				'event' => 'DELETE',
+				'model' => $model->alias,
+				'entity_id' => $model->id,
 				'json_object' => json_encode($audit),
-				'source_id'   => isset($source['id']) 				 ? $source['id'] 					: null,
-				'description' => isset($source['description']) ? $source['description'] : null
+				'source_id' => $source['id'],
+				'source_ip' => $source['ip'],
+				'source_url' => $source['url'],
+				'description' => $source['description']
 			]
 		];
 
@@ -266,15 +270,26 @@ class AuditableBehavior extends ModelBehavior {
  * @return array
  */
 	protected function _getSource(Model $model) {
+		$defaults = [
+			'id' => null,
+			'ip' => null,
+			'url' => null,
+			'description' => null
+		];
+
+		if ($source = Configure::read('AuditSource')) {
+			return $defaults + $source;
+		}
+
 		if ($model->hasMethod('currentUser')) {
-			return $model->currentUser();
+			return $defaults + $model->currentUser();
 		}
 
 		if ($model->hasMethod('current_user')) {
-			return $model->current_user();
+			return $defaults + $model->current_user();
 		}
 
-		return [];
+		return $defaults;
 	}
 
 /**

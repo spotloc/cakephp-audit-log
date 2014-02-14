@@ -1,7 +1,7 @@
 <?php $this->extend('/Layouts/Partials/admin_index'); ?>
 
 <?php $this->start('title'); ?>
-	<h2><i class="icon-align-justify"></i><span class="break"></span>Audits</h2>
+	<h2><i class="icon-align-justify"></i><span class="break"></span>Audit log</h2>
 <?php $this->end(); ?>
 
 <?php $this->start('main'); ?>
