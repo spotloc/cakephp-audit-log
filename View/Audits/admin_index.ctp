@@ -35,7 +35,8 @@
 			<td class="center"><span title="<?= h($item['Audit']['created']); ?>"><?= str_replace('on', '', $this->Time->timeAgoInWords($item['Audit']['created'])); ?></span></td>
 			<td class="actions center">
 				<?= $this->Html->link('<i class="halflings-icon zoom-in halflings-icon"></i>', ['action' => 'view', $item['Audit']['id']], ['class' => 'btn btn-success', 'escape' => false]); ?>
-				<?= $this->Html->link('<i class="halflings-icon th-list halflings-icon"></i>', ['controller' => 'audit_deltas', 'action' => 'index', '?' => ['model' => $item['Audit']['model'], 'entity_id' => $item['Audit']['entity_id']]], ['class' => 'btn btn-default', 'escape' => false]); ?>
+				<?= $this->Html->link('<i class="halflings-icon th-list halflings-icon"></i>', ['action' => 'view', $item['Audit']['id']], ['class' => 'btn btn-default', 'escape' => false]); ?>
+				<?= $this->Html->link('<i class="halflings-icon edit halflings-icon"></i>', ['plugin' => null, 'controller' => Inflector::underscore(Inflector::pluralize($item['Audit']['model'])), 'action' => 'edit', $item['Audit']['entity_id']], ['class' => 'btn btn-default', 'escape' => false]); ?>
 			</td>
 		</tr>
 	<?php endforeach; ?>
