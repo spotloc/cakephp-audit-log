@@ -26,7 +26,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `audits`
 --
 
-CREATE TABLE IF NOT EXISTS `audits` (
+CREATE TABLE `audits` (
   `id` varchar(36) NOT NULL,
   `event` varchar(255) NOT NULL,
   `model` varchar(255) NOT NULL,
@@ -35,6 +35,9 @@ CREATE TABLE IF NOT EXISTS `audits` (
   `description` text,
   `source_id` varchar(255) DEFAULT NULL,
   `created` datetime NOT NULL,
+  `delta_count` int(11) DEFAULT '0',
+  `source_ip` varchar(255) DEFAULT NULL,
+  `source_url` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -44,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `audits` (
 -- Table structure for table `audit_deltas`
 --
 
-CREATE TABLE IF NOT EXISTS `audit_deltas` (
+CREATE TABLE `audit_deltas` (
   `id` varchar(36) NOT NULL,
   `audit_id` varchar(36) NOT NULL,
   `property_name` varchar(255) NOT NULL,
