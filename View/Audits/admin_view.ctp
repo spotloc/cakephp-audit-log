@@ -82,8 +82,8 @@
 	table.Differences td,
 	.table tbody tbody { border-top: none; font-weight: normal; }
 
-	td.Left { border-right: 2px solid black; margin-right: 20px;}
-	td.Right { margin-left: 20px;}
+	td.Left { width: 40%; border-right: 2px solid black; margin-right: 20px;}
+	td.Right { width: 40%; margin-left: 20px;}
 
 	tbody.ChangeInsert { background-color: #dff0d8; }
 	tbody.ChangeDelete { background-color: #f2dede; }
