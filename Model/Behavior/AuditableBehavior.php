@@ -278,15 +278,15 @@ class AuditableBehavior extends ModelBehavior {
 		];
 
 		if ($source = Configure::read('AuditSource')) {
-			return $defaults + $source;
+			return $source + $defaults;
 		}
 
 		if ($model->hasMethod('currentUser')) {
-			return $defaults + $model->currentUser();
+			return $model->currentUser() + $defaults;
 		}
 
 		if ($model->hasMethod('current_user')) {
-			return $defaults + $model->current_user();
+			return $model->current_user() + $defaults;
 		}
 
 		return $defaults;
