@@ -85,6 +85,7 @@
 	td.Left { border-right: 2px solid black; margin-right: 20px;}
 	td.Right { margin-left: 20px;}
 
+	tbody.ChangeInsert { background-color: #dff0d8; }
 	tbody.ChangeDelete { background-color: #f2dede; }
 	tbody.ChangeReplace { background-color: #fcf8e3; }
 	</style>
