@@ -28,7 +28,8 @@
   "require":{
     "composer/installers":"*",
     "cakedc/search":"*",
-    "friendsofcake/crud":"3.*"
+    "friendsofcake/crud":"3.*",
+    "phpspec/php-diff":"dev-master"
   },
   "extra": {
     "installer-name": "AuditLog"

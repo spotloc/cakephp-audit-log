@@ -6,10 +6,13 @@ class AuditsController extends AuditLogAppController {
 
 	public $uses = ['AuditLog.Audit'];
 
+	public $helpers = ['AuditLog.AuditLog'];
+
 	public $presetVars = true;
 
 	public function beforeFilter() {
 		parent::beforeFilter();
+
 		$this->Audit->setupSearchPlugin();
 
 		$this->Crud->on('beforeLookup', function($event) {

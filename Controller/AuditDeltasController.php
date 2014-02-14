@@ -6,6 +6,8 @@ class AuditDeltasController extends AuditLogAppController {
 
 	public $uses = ['AuditLog.AuditDelta'];
 
+	public $helpers = ['AuditLog.AuditLog'];
+
 	public $presetVars = true;
 
 	public function beforeFilter() {

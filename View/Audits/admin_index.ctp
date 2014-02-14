@@ -20,20 +20,13 @@
 		<tbody>
 	<?php foreach ($items as $item): ?>
 		<tr>
-			<td class='center'><?= h($item['Audit']['event']); ?></td>
-			<td class='center'><?= $this->Html->link($item['Audit']['source_id'] ?: 'N/A', ['action' => 'index', '?' => ['source_id' => $item['Audit']['source_id']]]); ?>&nbsp;</td>
-			<td class='center'><?= $this->Html->link($item['Audit']['model'], ['action' => 'index', '?' => ['model' => $item['Audit']['model']]]); ?></td>
-			<td class='center'>
-				<?php
-				$name = isset($model) ? $item[$model][$displayField] : $item['Audit']['entity_id'];
-				$name = $this->Text->truncate($name, 50);
-
-				echo $this->Html->link($name, ['action' => 'index', '?' => ['model' => $item['Audit']['model'], 'entity_id' => $item['Audit']['entity_id']]]);
-				?>
-			</td>
-			<td class='center'><?= h($item['Audit']['delta_count']); ?>&nbsp;</td>
-			<td class="center"><span title="<?= h($item['Audit']['created']); ?>"><?= str_replace('on', '', $this->Time->timeAgoInWords($item['Audit']['created'])); ?></span></td>
-			<td class="actions center">
+			<td><?= $this->AuditLog->getEvent($item); ?></td>
+			<td><?= $this->Html->link($this->AuditLog->getSource($item), ['action' => 'index', '?' => ['source_id' => $item['Audit']['source_id']]]); ?>&nbsp;</td>
+			<td><?= $this->Html->link($item['Audit']['model'], ['action' => 'index', '?' => ['model' => $item['Audit']['model']]]); ?></td>
+			<td><?= $this->Html->link($this->AuditLog->getIdentifier($item), ['action' => 'index', '?' => ['model' => $item['Audit']['model'], 'entity_id' => $item['Audit']['entity_id']]]); ?></td>
+			<td><?= h($item['Audit']['delta_count']); ?>&nbsp;</td>
+			<td><span title="<?= h($item['Audit']['created']); ?>"><?= str_replace('on', '', $this->Time->timeAgoInWords($item['Audit']['created'])); ?></span></td>
+			<td class="actions">
 				<?= $this->Html->link('<i class="halflings-icon edit"></i>', ['plugin' => null, 'controller' => Inflector::underscore(Inflector::pluralize($item['Audit']['model'])), 'action' => 'edit', $item['Audit']['entity_id']], ['class' => 'btn btn-success', 'escape' => false]); ?>
 				<?= $this->Html->link('<i class="halflings-icon dashboard"></i>', ['controller' => 'audit_deltas', 'action' => 'index', '?' => ['model' => $item['Audit']['model'], 'entity_id' => $item['Audit']['entity_id']]], ['class' => 'btn btn-info', 'escape' => false]); ?>
 				<?= $this->Html->link('<i class="halflings-icon eye-open"></i>', ['action' => 'view', $item['Audit']['id']], ['class' => 'btn btn-default', 'escape' => false]); ?>

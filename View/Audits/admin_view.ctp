@@ -73,6 +73,21 @@
 <?php $this->end(); ?>
 
 <?php $this->start('associated'); ?>
+	<style type="text/css">
+	del { background-color: #f2dede; }
+	ins { color: #3c763d; background-color: #dff0d8; text-decoration: none; border: 1px solid #d6e9c6; }
+
+	table.Differences { width: 100%; font-weight: normal; }
+	table.Differences th,
+	table.Differences td,
+	.table tbody tbody { border-top: none; font-weight: normal; }
+
+	td.Left { border-right: 2px solid black; margin-right: 20px;}
+	td.Right { margin-left: 20px;}
+
+	tbody.ChangeDelete { background-color: #f2dede; }
+	tbody.ChangeReplace { background-color: #fcf8e3; }
+	</style>
 	<?php if (!empty($item['AuditDelta'])):?>
 	<div class="row-fluid">
 		<div class="box span12">
@@ -84,16 +99,14 @@
 				<thead>
 					<tr>
 						<th><?= __('Field'); ?></th>
-						<th><?= __('Old value'); ?></th>
-						<th><?= __('New value') ?></th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 				<?php foreach ($item['AuditDelta'] as $it) : ?>
 					<tr>
 						<td><?= $it['property_name'];?></td>
-						<td><?= $this->Text->truncate($it['old_value'], 50) ?: 'N/A'; ?></td>
-						<td><?= $this->Text->truncate($it['new_value'], 50) ?: 'N/A'; ?></td>
+						<td><?= $this->AuditLog->getDiff($it['property_name'], $it['new_value'], $it['old_value']); ?></td>
 					</tr>
 				<?php endforeach; ?>
 				</tbody>
