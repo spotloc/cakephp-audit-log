@@ -22,8 +22,8 @@
 			<td class='center'><?= str_replace('on', '', $this->Time->timeAgoInWords($item['Audit']['created'])); ?>&nbsp;</td>
 			<td class='center'><?= $this->Html->link($item['Audit']['model'] . ' # ' . $item['Audit']['entity_id'], ['controller' => 'audits', 'action' => 'index', '?' => ['model' => $item['Audit']['model'], 'entity_id' => $item['Audit']['entity_id']]]); ?>&nbsp;</td>
 			<td class='center'><?= h($item['AuditDelta']['property_name']); ?>&nbsp;</td>
-			<td class='center'><?= h($this->Text->truncate($item['AuditDelta']['old_value'], 50)); ?>&nbsp;</td>
-			<td class='center'><?= h($this->Text->truncate($item['AuditDelta']['new_value'], 50)); ?>&nbsp;</td>
+			<td class='center'><?= $this->AuditLog->outputValue($item['AuditDelta']['old_value']); ?>&nbsp;</td>
+			<td class='center'><?= $this->AuditLog->outputValue($item['AuditDelta']['new_value']); ?>&nbsp;</td>
 			<td class='center'><?= $this->Html->link($item['Audit']['id'], ['controller' => 'audits', 'action' => 'view', $item['Audit']['id']]); ?>&nbsp;</td>
 		</tr>
 	<?php endforeach; ?>

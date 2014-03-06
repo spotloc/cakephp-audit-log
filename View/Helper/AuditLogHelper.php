@@ -23,6 +23,18 @@ class AuditLogHelper extends AppHelper {
 		return $item['Audit']['source_id'];
 	}
 
+	public function outputValue($value) {
+		if ($value === NULL) {
+			return 'NULL';
+		}
+
+		if ($value === '') {
+			return '(EMPTY)';
+		}
+
+		return h($this->Text->truncate($value, 50));
+	}
+
 	public function getIdentifier($item) {
 		if (empty($this->_View->viewVars['model'])) {
 			$name = $item['Audit']['entity_id'];
