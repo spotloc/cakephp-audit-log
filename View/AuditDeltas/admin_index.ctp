@@ -8,16 +8,18 @@
 	<table class="table table-striped bootstrap-datatable datatable">
 		<thead>
 		<tr>
+			<th><?= $this->Paginator->sort('Audit.created');?></th>
 			<th>Resource</th>
-			<th><?= $this->Paginator->sort('property_name');?></th>
-			<th><?= $this->Paginator->sort('old_value');?></th>
-			<th><?= $this->Paginator->sort('new_value');?></th>
-			<th><?= $this->Paginator->sort('id');?></th>
+			<th><?= $this->Paginator->sort('AuditDelta.property_name');?></th>
+			<th><?= $this->Paginator->sort('AuditDelta.old_value');?></th>
+			<th><?= $this->Paginator->sort('AuditDelta.new_value');?></th>
+			<th><?= $this->Paginator->sort('Audit.id');?></th>
 		</tr>
 		</thead>
 		<tbody>
 	<?php foreach ($items as $item): ?>
 		<tr>
+			<td class='center'><?= str_replace('on', '', $this->Time->timeAgoInWords($item['Audit']['created'])); ?>&nbsp;</td>
 			<td class='center'><?= $this->Html->link($item['Audit']['model'] . ' # ' . $item['Audit']['entity_id'], ['controller' => 'audits', 'action' => 'index', '?' => ['model' => $item['Audit']['model'], 'entity_id' => $item['Audit']['entity_id']]]); ?>&nbsp;</td>
 			<td class='center'><?= h($item['AuditDelta']['property_name']); ?>&nbsp;</td>
 			<td class='center'><?= h($this->Text->truncate($item['AuditDelta']['old_value'], 50)); ?>&nbsp;</td>

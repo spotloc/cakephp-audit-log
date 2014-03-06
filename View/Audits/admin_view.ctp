@@ -82,12 +82,37 @@
 	table.Differences td,
 	.table tbody tbody { border-top: none; font-weight: normal; }
 
-	td.Left { width: 40%; border-right: 2px solid black; margin-right: 20px;}
-	td.Right { width: 40%; margin-left: 20px;}
+	td.Left {
+		width: 40%;
+		border-right: 1px solid black;
+		margin-right: 0px;
+	}
+	td.Right {
+		width: 40%;
+		margin-left: 5px;
+	}
 
-	tbody.ChangeInsert { background-color: #dff0d8; }
-	tbody.ChangeDelete { background-color: #f2dede; }
-	tbody.ChangeReplace { background-color: #fcf8e3; }
+	tbody.ChangeInsert {
+		background-color: #dff0d8;
+	}
+
+	tbody.ChangeDelete {
+		background-color: #f2dede;
+	}
+
+	tbody.ChangeReplace {
+		background-color: #fcf8e3;
+		border-right: 1px solid black;
+	}
+
+	tbody.ChangeReplace th {
+		width: 2%;
+		background-color: #eee;
+		text-align: center;
+		border-right: 1px solid black;
+		border-left: 1px solid black;
+	}
+
 	</style>
 	<?php if (!empty($item['AuditDelta'])):?>
 	<div class="row-fluid">

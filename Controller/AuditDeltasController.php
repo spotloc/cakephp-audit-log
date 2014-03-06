@@ -21,6 +21,10 @@ class AuditDeltasController extends AuditLogAppController {
 			}
 		});
 
+		$this->Paginator->settings['order'] = [
+			'Audit.created' => 'asc'
+		];
+
 		$this->Paginator->settings['contain'] = [
 			'Audit' => [
 				'fields' => [
