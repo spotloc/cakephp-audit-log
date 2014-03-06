@@ -130,6 +130,13 @@
 		border-right: 1px solid black;
 		border-left: 1px solid black;
 	}
+
+	tbody.ChangeInsert td,
+	tbody.ChangeDelete td,
+	tbody.ChangeReplace td {
+		width: 98%;
+	}
+
 	</style>
 
 	<?php if (!empty($item['AuditDelta'])):?>
