@@ -74,19 +74,35 @@
 
 <?php $this->start('associated'); ?>
 	<style type="text/css">
-	del { background-color: #f2dede; }
-	ins { color: #3c763d; background-color: #dff0d8; text-decoration: none; border: 1px solid #d6e9c6; }
+	del {
+		background-color: #f2dede;
+	}
 
-	table.Differences { width: 100%; font-weight: normal; }
+	ins {
+		color: #3c763d;
+		background-color: #dff0d8;
+		text-decoration: none;
+		border: 1px solid #d6e9c6;
+	}
+
+	table.Differences {
+		width: 100%;
+		font-weight: normal;
+	}
+
 	table.Differences th,
 	table.Differences td,
-	.table tbody tbody { border-top: none; font-weight: normal; }
+	.table tbody tbody {
+		border-top: none;
+		font-weight: normal;
+	}
 
 	td.Left {
 		width: 40%;
 		border-right: 1px solid black;
 		margin-right: 0px;
 	}
+
 	td.Right {
 		width: 40%;
 		margin-left: 5px;
@@ -105,6 +121,8 @@
 		border-right: 1px solid black;
 	}
 
+	tbody.ChangeInsert th,
+	tbody.ChangeDelete th,
 	tbody.ChangeReplace th {
 		width: 2%;
 		background-color: #eee;
@@ -112,8 +130,8 @@
 		border-right: 1px solid black;
 		border-left: 1px solid black;
 	}
-
 	</style>
+
 	<?php if (!empty($item['AuditDelta'])):?>
 	<div class="row-fluid">
 		<div class="box span12">
