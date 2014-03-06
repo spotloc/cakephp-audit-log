@@ -134,7 +134,7 @@
 	tbody.ChangeInsert td,
 	tbody.ChangeDelete td,
 	tbody.ChangeReplace td {
-		width: 98%;
+		width: 48%;
 	}
 
 	</style>
