@@ -60,7 +60,7 @@ class AuditLogHelper extends AppHelper {
 			'ignoreCase' => true
 		];
 
-		$diff = new Diff((array)$new, (array)$old, $config);
+		$diff = new Diff((array)$old, (array)$new, $config);
 		return $diff->render(new Diff_Renderer_Html_SideBySide());
 	}
 
