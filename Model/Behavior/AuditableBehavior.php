@@ -40,7 +40,8 @@ class AuditableBehavior extends ModelBehavior {
 			$this->settings[$model->alias] = [
 				'on' 		 => ['delete', 'create', 'update'],
 				'ignore' => ['created', 'updated', 'modified'],
-				'habtm'  => []
+				'habtm'  => [],
+				'json_object' => true
 			];
 		}
 
@@ -137,13 +138,16 @@ class AuditableBehavior extends ModelBehavior {
 				'event' => $created ? 'CREATE' : 'EDIT',
 				'model' => $model->alias,
 				'entity_id' => $model->id,
-				'json_object' => json_encode($audit),
 				'source_id' => $source['id'],
 				'source_ip' => $source['ip'],
 				'source_url' => $source['url'],
 				'description' => $source['description']
 			]
 		];
+
+		if ($this->_settings[$model->alias]['json_object']) {
+			$data['Audit']['json_object'] = json_encode($audit);
+		}
 
 		$updates = [];
 		foreach ($audit[$model->alias] as $property => $value) {
@@ -239,13 +243,16 @@ class AuditableBehavior extends ModelBehavior {
 				'event' => 'DELETE',
 				'model' => $model->alias,
 				'entity_id' => $model->id,
-				'json_object' => json_encode($audit),
 				'source_id' => $source['id'],
 				'source_ip' => $source['ip'],
 				'source_url' => $source['url'],
 				'description' => $source['description']
 			]
 		];
+
+		if ($this->_settings[$model->alias]['json_object']) {
+			$data['Audit']['json_object'] = json_encode($audit);
+		}
 
 		$audit = ClassRegistry::init('AuditLog.Audit');
 		$audit->create();

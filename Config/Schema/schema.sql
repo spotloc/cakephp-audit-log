@@ -31,7 +31,7 @@ CREATE TABLE `audits` (
   `event` varchar(255) NOT NULL,
   `model` varchar(255) NOT NULL,
   `entity_id` varchar(36) NOT NULL,
-  `json_object` text NOT NULL,
+  `json_object` text DEFAULT NULL,
   `description` text,
   `source_id` varchar(255) DEFAULT NULL,
   `created` datetime NOT NULL,
