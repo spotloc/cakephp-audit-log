@@ -36,6 +36,10 @@ class Audit extends Model {
  * @return integer
  */
 	public function paginateCount($conditions, $recursive, $extra) {
+		if (empty($extra['do_count'])) {
+			return 10000;
+		}
+
 		return $this->find('count', compact('conditions'));
 	}
 

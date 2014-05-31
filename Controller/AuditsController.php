@@ -37,6 +37,7 @@ class AuditsController extends AuditLogAppController {
 				$Instance = ClassRegistry::init($model);
 
 				$displayField = $Instance->displayField;
+				$this->Paginator->settings['do_count'] = empty($Instance->noAuditCount);
 				$this->Paginator->settings['fields'][] = $model . '.' . $displayField;
 				$this->Paginator->settings['joins'][] = [
 					'alias' => $model,
