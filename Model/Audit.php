@@ -27,4 +27,16 @@ class Audit extends Model {
 		$this->Behaviors->load('Search.Searchable');
 	}
 
+/**
+ * Make sure not to include any join's in the COUNT(*) from paginator
+ *
+ * @param  array $conditions
+ * @param  integer $recursive
+ * @param  array $extra
+ * @return integer
+ */
+	public function paginateCount($conditions, $recursive, $extra) {
+		return $this->find('count', compact('conditions'));
+	}
+
 }

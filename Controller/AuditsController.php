@@ -21,30 +21,27 @@ class AuditsController extends AuditLogAppController {
 	}
 
 	public function admin_index() {
+		$this->Paginator->settings['fields'] = [
+			'Audit.id',
+			'Audit.event',
+			'Audit.model',
+			'Audit.entity_id',
+			'Audit.description',
+			'Audit.source_id',
+			'Audit.created',
+			'Audit.delta_count',
+		];
+
 		$this->Crud->on('beforePaginate', function($event) {
 			if ($model = $this->request->query('model')) {
 				$Instance = ClassRegistry::init($model);
 
 				$displayField = $Instance->displayField;
-
-				$this->Paginator->settings['fields'] = [
-					'Audit.id',
-					'Audit.event',
-					'Audit.model',
-					'Audit.entity_id',
-					'Audit.description',
-					'Audit.source_id',
-					'Audit.created',
-					'Audit.delta_count',
-					$model . '.' . $displayField
-				];
-
+				$this->Paginator->settings['fields'][] = $model . '.' . $displayField;
 				$this->Paginator->settings['joins'][] = [
 					'alias' => $model,
 					'table' => $Instance->useTable,
-					'conditions' => [
-						$Instance->alias . '.id = Audit.entity_id'
-					],
+					'conditions' => [$Instance->alias . '.id = Audit.entity_id'],
 					'type' => 'INNER'
 				];
 
