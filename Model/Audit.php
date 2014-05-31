@@ -10,13 +10,17 @@ class Audit extends Model {
 		]
 	];
 
-	public $actsAs = ['Containable'];
+	public $actsAs = [
+		'Containable'
+	];
+
+	public $order = [
+		'Audit.id' => 'desc'
+	];
 
 	public $recursive = -1;
 
 	public function setupSearchPlugin() {
-		$this->order = 'Audit.created DESC';
-
 		$this->filterArgs = [
 			'event' 		=> ['type' => 'value'],
 			'model' 		=> ['type' => 'value'],
