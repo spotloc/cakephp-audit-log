@@ -186,6 +186,12 @@ class AuditableBehavior extends Behavior
         if ($entity->isNew() || count($updates)) {
             $audit = $Audits->newEntity($data);
             $audit = $Audits->save($audit);
+            if ( !$audit || !empty($audit->errors()) || empty($audit->id) ) {
+                throw new \UnexpectedValueException(
+                    'Error saving audit ', print_r($audit, true)
+                );
+            }
+
             if ($entity->isNew() && method_exists($this->_table, 'afterAuditCreate')) {
                 $this->_table->afterAuditCreate();
             }
@@ -204,6 +210,11 @@ class AuditableBehavior extends Behavior
 
             $delta = $Audits->AuditDeltas->newEntity($delta);
             $delta = $Audits->AuditDeltas->save($delta);
+            if ( !$delta || !empty($delta->errors()) || empty($delta->id) ) {
+                throw new \UnexpectedValueException(
+                    'Error saving audit delta for ' . print_r($delta, true)
+                );
+            }
 
             if (!$entity->isNew() && method_exists($this->_table, 'afterAuditProperty')) {
                 $this->_table->afterAuditProperty(
