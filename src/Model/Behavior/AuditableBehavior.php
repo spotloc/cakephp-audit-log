@@ -322,11 +322,20 @@ class AuditableBehavior extends Behavior
     {
         $habtm = $this->config('habtm');
         $alias = $this->_table->alias();
+        $primaryKey = (array)$this->_table->primaryKey();
+
+        if ( empty($primaryKey) ) {
+            throw new \UnexpectedValueException(
+                'Invalid primary key for ' . $this->_table->alias()
+            );
+        }
+
+        foreach ($primaryKey as $key ) {
+            $conditions[$alias . '.' . $key] = $entity->$key;
+        }
 
         $query = $this->_table->find('all', [
-            'conditions'    => [
-                $alias . '.' . $this->_table->primaryKey() => $entity->id
-            ],
+            'conditions'    => $conditions,
         ]);
         if ( !empty($habtm) ) {
             $query->contain(array_values($habtm));
