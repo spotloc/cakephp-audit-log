@@ -85,9 +85,9 @@ class AuditableBehaviorTest extends TestCase
             ]
         ])->firstOrFail();
 
-        $this->assertEquals('15', $audit->id);
-        $this->assertEquals('127.0.0.1', $audit->ip);
-        $this->assertEquals('http://127.0.0.1/articles', $audit->url);
+        $this->assertEquals('15', $audit->source_id);
+        $this->assertEquals('127.0.0.1', $audit->source_ip);
+        $this->assertEquals('http://127.0.0.1/articles', $audit->source_url);
         $this->assertEquals('Testing audit log', $audit->description);
 
         $article = json_decode($audit->json_object, true);
