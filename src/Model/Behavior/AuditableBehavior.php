@@ -171,6 +171,10 @@ class AuditableBehavior extends Behavior
                 continue;
             }
 
+            if ( is_object($value) && $this->_original[$property] == $value) {
+                continue;
+            }
+
             $updates[] = [
                 'property_name' => $property,
                 'old_value'     => $this->_original[$property],
@@ -199,7 +203,8 @@ class AuditableBehavior extends Behavior
             $delta['audit_id'] = $audit->id;
 
             $delta = $Audits->AuditDeltas->newEntity($delta);
-            $Audits->AuditDeltas->save($delta);
+            $delta = $Audits->AuditDeltas->save($delta);
+
             if (!$entity->isNew() && method_exists($this->_table, 'afterAuditProperty')) {
                 $this->_table->afterAuditProperty(
                     $delta['property_name'],
@@ -212,8 +217,6 @@ class AuditableBehavior extends Behavior
         if (!empty($this->_original)) {
             unset($this->_original);
         }
-
-        return true;
     }
 
     /**
