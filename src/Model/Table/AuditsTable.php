@@ -5,6 +5,7 @@ use AuditLog\Model\Entity\Audit;
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
+use Cake\ORM\TableRegistry;
 use Cake\Validation\Validator;
 
 /**
@@ -12,6 +13,7 @@ use Cake\Validation\Validator;
  */
 class AuditsTable extends Table
 {
+    public $filterArgs = [];
 
     /**
      * Initialize method
@@ -30,43 +32,32 @@ class AuditsTable extends Table
             'foreignKey' => 'audit_id',
             'className' => 'AuditLog.AuditDeltas'
         ]);
+        $this->setupSearchPlugin();
     }
 
+
     /**
-     * Default validation rules.
+     * Enable search plugin
      *
-     * @param \Cake\Validation\Validator $validator Validator instance.
-     * @return \Cake\Validation\Validator
+     * @return null
      */
-    public function validationDefault(Validator $validator)
+    public function setupSearchPlugin()
     {
-        $validator
-            ->allowEmpty('id', 'create');
+        $this->filterArgs = [
+            'event' => [
+                'type' => 'value'
+            ],
+            'model' => [
+                'type' => 'value'
+            ],
+            'source_id' => [
+                'type' => 'value'
+            ],
+            'entity_id' => [
+                'type' => 'value'
+            ],
+        ];
 
-        $validator
-            ->requirePresence('event', 'create')
-            ->notEmpty('event');
-
-        $validator
-            ->requirePresence('model', 'create')
-            ->notEmpty('model');
-
-        $validator
-            ->allowEmpty('json_object');
-
-        $validator
-            ->allowEmpty('description');
-
-        $validator
-            ->add('delta_count', 'valid', ['rule' => 'numeric'])
-            ->allowEmpty('delta_count');
-
-        $validator
-            ->allowEmpty('source_ip');
-
-        $validator
-            ->allowEmpty('source_url');
-
-        return $validator;
+        $this->addBehavior('Search.Searchable');
     }
 }

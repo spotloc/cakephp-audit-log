@@ -12,7 +12,7 @@ use Cake\Validation\Validator;
  */
 class AuditDeltasTable extends Table
 {
-
+    public $filterArgs = [];
     /**
      * Initialize method
      *
@@ -22,49 +22,57 @@ class AuditDeltasTable extends Table
     public function initialize(array $config)
     {
         $this->table('audit_deltas');
-        $this->displayField('id');
+        $this->displayField('property_name');
         $this->primaryKey('id');
         $this->belongsTo('Audits', [
             'foreignKey' => 'audit_id',
             'joinType' => 'INNER',
             'className' => 'AuditLog.Audits'
         ]);
+        $this->addBehavior('CounterCache', [
+             'Audits' => ['delta_count']
+        ]);
+        $this->setupSearchPlugin();
     }
 
-    /**
-     * Default validation rules.
-     *
-     * @param \Cake\Validation\Validator $validator Validator instance.
-     * @return \Cake\Validation\Validator
-     */
-    public function validationDefault(Validator $validator)
+    public function setupSearchPlugin()
     {
-        $validator
-            ->allowEmpty('id', 'create');
+        $this->filterArgs = [
+            'source_id' => [
+                'type'  => 'value',
+                'field' => 'Audits.source_id',
+                'model' => 'Audits',
+                'fields' => [
+                    'id' => 'source_id',
+                    'label' => 'source_id',
+                    'value' => 'source_id'
+                ]
+            ],
+            'model' => [
+                'type'  => 'value',
+                'field' => 'Audits.model',
+                'model' => 'Audits',
+                'fields' => [
+                    'id' => 'model',
+                    'label' => 'model',
+                    'value' => 'model'
+                ]
+            ],
+            'entity_id' => [
+                'type'  => 'value',
+                'field' => 'Audits.entity_id',
+                'model' => 'Audits',
+                'fields' => [
+                    'id' => 'entity_id',
+                    'label' => 'entity_id',
+                    'value' => 'entity_id'
+                ]
+            ],
+            'property_name' => ['type' => 'value'],
+            'old_value'         => ['type' => 'value'],
+            'new_value'         => ['type' => 'value'],
+        ];
 
-        $validator
-            ->requirePresence('property_name', 'create')
-            ->notEmpty('property_name');
-
-        $validator
-            ->allowEmpty('old_value');
-
-        $validator
-            ->allowEmpty('new_value');
-
-        return $validator;
-    }
-
-    /**
-     * Returns a rules checker object that will be used for validating
-     * application integrity.
-     *
-     * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
-     * @return \Cake\ORM\RulesChecker
-     */
-    public function buildRules(RulesChecker $rules)
-    {
-        $rules->add($rules->existsIn(['audit_id'], 'Audits'));
-        return $rules;
+        $this->addBehavior('Search.Searchable');
     }
 }
