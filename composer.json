@@ -27,11 +27,24 @@
   },
   "require":{
     "composer/installers":"*",
+	"php": ">=5.4.16",
+    "cakephp/cakephp": "~3.0"
     "cakedc/search":"*",
-    "friendsofcake/crud":"3.*",
+    "friendsofcake/crud":"~4.0",
     "phpspec/php-diff":"dev-master"
   },
-  "extra": {
-    "installer-name": "AuditLog"
+  "require-dev": {
+        "phpunit/phpunit": "*"
+  },
+  "autoload": {
+      "psr-4": {
+          "AuditLog\\": "src"
+      }
+  },
+  "autoload-dev": {
+      "psr-4": {
+          "AuditLog\\Test\\": "tests",
+          "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
+      }
   }
 }
