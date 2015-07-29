@@ -193,7 +193,7 @@ class AuditableBehavior extends ModelBehavior {
 			$audit->save($data);
 
 			if ($created && $model->hasMethod('afterAuditCreate')) {
-				$model->afterAuditCreate($model);
+				$model->afterAuditCreate($model, $audit->id);
 			}
 
 			if (!$created && $model->hasMethod('afterAuditUpdate')) {
@@ -257,6 +257,10 @@ class AuditableBehavior extends ModelBehavior {
 		$audit = ClassRegistry::init('AuditLog.Audit');
 		$audit->create();
 		$audit->save($data);
+
+		if ($model->hasMethod('afterAuditDelete')) {
+			$model->afterAuditDelete($model, $audit->id);
+		}
 	}
 
 /**
