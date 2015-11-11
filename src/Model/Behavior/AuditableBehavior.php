@@ -193,7 +193,7 @@ class AuditableBehavior extends Behavior
             }
 
             if ($entity->isNew() && method_exists($this->_table, 'afterAuditCreate')) {
-                $this->_table->afterAuditCreate();
+                $this->_table->afterAuditCreate($audit->id);
             }
 
             if (!$entity->isNew() && method_exists($this->_table, 'afterAuditUpdate')) {
