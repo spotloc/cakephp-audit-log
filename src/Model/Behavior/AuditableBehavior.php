@@ -264,6 +264,10 @@ class AuditableBehavior extends Behavior
         $Audits = TableRegistry::get('AuditLog.Audits');
         $audit = $Audits->newEntity($data);
         $Audits->save($audit);
+
+        if (method_exists($this->_table, 'afterAuditDelete')) {
+            $this->_table->afterAuditDelete($audit);
+        }
     }
 
     /**
