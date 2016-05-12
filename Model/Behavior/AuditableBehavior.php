@@ -145,7 +145,7 @@ class AuditableBehavior extends ModelBehavior {
 			]
 		];
 
-		if (!empty($this->_settings[$model->alias]['json_object'])) {
+		if (!empty($this->settings[$model->alias]['json_object'])) {
 			$data['Audit']['json_object'] = json_encode($audit);
 		}
 
@@ -250,7 +250,7 @@ class AuditableBehavior extends ModelBehavior {
 			]
 		];
 
-		if (!empty($this->_settings[$model->alias]['json_object'])) {
+		if (!empty($this->settings[$model->alias]['json_object'])) {
 			$data['Audit']['json_object'] = json_encode($audit);
 		}
 
