@@ -53,6 +53,5 @@ class AuditsTable extends Table
             ],
         ];
 
-        $this->addBehavior('Search.Searchable');
     }
 }
