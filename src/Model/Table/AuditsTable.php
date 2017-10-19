@@ -4,11 +4,12 @@ namespace AuditLog\Model\Table;
 use Cake\ORM\Table;
 
 /**
- * AuditDeltas Model
+ * Audits Model
  */
-class AuditDeltasTable extends Table
+class AuditsTable extends Table
 {
     public $filterArgs = [];
+
     /**
      * Initialize method
      *
@@ -17,56 +18,41 @@ class AuditDeltasTable extends Table
      */
     public function initialize(array $config)
     {
-        $this->setTable('audit_deltas');
-        $this->setDisplayField('property_name');
+        $this->setTable('audits');
+        $this->setDisplayField('id');
         $this->setPrimaryKey('id');
-        $this->belongsTo('Audits', [
+        $this->addBehavior('Timestamp');
+
+        $this->hasMany('AuditDeltas', [
             'foreignKey' => 'audit_id',
-            'joinType' => 'INNER',
-            'className' => 'AuditLog.Audits'
-        ]);
-        $this->addBehavior('CounterCache', [
-             'Audits' => ['delta_count']
+            'className' => 'AuditLog.AuditDeltas'
         ]);
         $this->setupSearchPlugin();
     }
 
+
+    /**
+     * Enable search plugin
+     *
+     * @return null
+     */
     public function setupSearchPlugin()
     {
         $this->filterArgs = [
-            'source_id' => [
-                'type'  => 'value',
-                'field' => 'Audits.source_id',
-                'model' => 'Audits',
-                'fields' => [
-                    'id' => 'source_id',
-                    'label' => 'source_id',
-                    'value' => 'source_id'
-                ]
+            'event' => [
+                'type' => 'value'
             ],
             'model' => [
-                'type'  => 'value',
-                'field' => 'Audits.model',
-                'model' => 'Audits',
-                'fields' => [
-                    'id' => 'model',
-                    'label' => 'model',
-                    'value' => 'model'
-                ]
+                'type' => 'value'
+            ],
+            'source_id' => [
+                'type' => 'value'
             ],
             'entity_id' => [
-                'type'  => 'value',
-                'field' => 'Audits.entity_id',
-                'model' => 'Audits',
-                'fields' => [
-                    'id' => 'entity_id',
-                    'label' => 'entity_id',
-                    'value' => 'entity_id'
-                ]
+                'type' => 'value'
             ],
-            'property_name' => ['type' => 'value'],
-            'old_value'         => ['type' => 'value'],
-            'new_value'         => ['type' => 'value'],
         ];
+
+        $this->addBehavior('Search.Searchable');
     }
 }
