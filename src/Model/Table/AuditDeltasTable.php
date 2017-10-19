@@ -1,11 +1,7 @@
 <?php
 namespace AuditLog\Model\Table;
 
-use AuditLog\Model\Entity\AuditDelta;
-use Cake\ORM\Query;
-use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
-use Cake\Validation\Validator;
 
 /**
  * AuditDeltas Model
@@ -21,9 +17,9 @@ class AuditDeltasTable extends Table
      */
     public function initialize(array $config)
     {
-        $this->table('audit_deltas');
-        $this->displayField('property_name');
-        $this->primaryKey('id');
+        $this->setTable('audit_deltas');
+        $this->setDisplayField('property_name');
+        $this->setPrimaryKey('id');
         $this->belongsTo('Audits', [
             'foreignKey' => 'audit_id',
             'joinType' => 'INNER',
@@ -72,7 +68,5 @@ class AuditDeltasTable extends Table
             'old_value'         => ['type' => 'value'],
             'new_value'         => ['type' => 'value'],
         ];
-
-        $this->addBehavior('Search.Searchable');
     }
 }
