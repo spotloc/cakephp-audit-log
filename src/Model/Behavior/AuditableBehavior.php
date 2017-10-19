@@ -10,7 +10,7 @@ use Cake\ORM\TableRegistry;
 use Cake\Core\Configure;
 use Cake\Utility\Inflector;
 /**
- * Auditable behavior
+ * Auditable behavior mod
  */
 class AuditableBehavior extends Behavior
 {
