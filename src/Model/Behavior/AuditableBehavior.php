@@ -58,7 +58,7 @@ class AuditableBehavior extends Behavior
 
         foreach ($habtm as $index => $modelName) {
 
-            $association = $this->_table->association($modelName);
+            $association = $this->_table->getAssociation($modelName);
 
             if (!$association instanceof BelongsToMany) {
                 unset($habtm[$index]);
@@ -184,7 +184,7 @@ class AuditableBehavior extends Behavior
 
         $audit = $Audits->newEntity($data);
         $audit = $Audits->save($audit);
-        if (!$audit || !empty($audit->errors()) || empty($audit->id)) {
+        if (!$audit || !empty($audit->getErrors()) || empty($audit->id)) {
             throw new \UnexpectedValueException(
                 'Error saving audit ', print_r($audit, true)
             );
@@ -212,7 +212,7 @@ class AuditableBehavior extends Behavior
         $auditDelta = $Audits->AuditDeltas->newEntity($delta);
         $auditDelta = $Audits->AuditDeltas->save($auditDelta);
 
-        if (!$auditDelta || !empty($auditDelta->errors()) || empty($auditDelta->id)) {
+        if (!$auditDelta || !empty($auditDelta->getErrors()) || empty($auditDelta->id)) {
             throw new \UnexpectedValueException(
                 'Error saving audit delta for ' . print_r($auditDelta, true)
             );
@@ -274,7 +274,7 @@ class AuditableBehavior extends Behavior
         $auditDelta = $Audits->AuditDeltas->newEntity($delta);
         $auditDelta = $Audits->AuditDeltas->save($auditDelta);
 
-        if (!$auditDelta || !empty($auditDelta->errors()) || empty($auditDelta->id)) {
+        if (!$auditDelta || !empty($auditDelta->getErrors()) || empty($auditDelta->id)) {
             throw new \UnexpectedValueException(
                 'Error saving audit delta for ' . print_r($auditDelta, true)
             );
