@@ -9,10 +9,10 @@ trait CurrentUserTrait
   {
 
     $request = ServerRequestFactory::fromGlobals();
-    $session = $request->session();
+    $session = $request->getSession();
     return [
         'id' => $session->read('Auth.User.username'),
-        'ip' => $request->env('REMOTE_ADDR'),
+        'ip' => $request->getEnv('REMOTE_ADDR'),
         'url' => $request->getRequestTarget(),
         'description' => $session->read('Auth.User.username'),
     ];
