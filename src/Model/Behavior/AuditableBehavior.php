@@ -44,7 +44,7 @@ class AuditableBehavior extends Behavior
      * @param array $config The configuration settings provided to this behavior.
      * @return void
      */
-    public function initialize(array $config)
+    public function initialize(array $config) : void
     {
         parent::initialize($config);
 
@@ -78,7 +78,7 @@ class AuditableBehavior extends Behavior
      * @param  Entity $entity Entity to save
      *
      */
-    public function beforeSave(Event $event, Entity $entity)
+    public function beforeSave(\Cake\Event\EventInterface $event, Entity $entity)
     {
         if (!$this->_shouldProcess('create') && !$this->_shouldProcess('update')) {
             return;
@@ -97,7 +97,7 @@ class AuditableBehavior extends Behavior
      * @param  Entity $entity Entity to save
      *
      */
-    public function beforeDelete(Event $event, Entity $entity)
+    public function beforeDelete(\Cake\Event\EventInterface $event, Entity $entity)
     {
         if (!$this->_shouldProcess('delete')) {
             return;
@@ -116,7 +116,7 @@ class AuditableBehavior extends Behavior
      *
      * @return  void
      */
-    public function afterSave(Event $event, Entity $entity)
+    public function afterSave(\Cake\Event\EventInterface $event, Entity $entity)
     {
         if ($entity->isNew() && !$this->_shouldProcess('create')) {
             return;
@@ -238,7 +238,7 @@ class AuditableBehavior extends Behavior
      * @param  Entity $entity Entity to save
      *
      */
-    public function afterDelete(Event $event, Entity $entity)
+    public function afterDelete(\Cake\Event\EventInterface $event, Entity $entity)
     {
         if (!$this->_shouldProcess('delete')) {
             return;
