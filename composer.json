@@ -1,9 +1,8 @@
 {
-  "name":"jippi/cakephp-audit-log",
-  "version": "4.1.0",
-  "description":"A logging plugin for CakePHP. It takes a snapshot of the fully hydrated object after a change is complete and it also records each individual change in the case of an update action",
-  "type":"cakephp-plugin",
-  "keywords":[
+  "name": "jippi/cakephp-audit-log",
+  "description": "A logging plugin for CakePHP. It takes a snapshot of the fully hydrated object after a change is complete and it also records each individual change in the case of an update action",
+  "type": "cakephp-plugin",
+  "keywords": [
     "cakephp",
     "audit",
     "log",
@@ -11,24 +10,24 @@
     "logging",
     "plugin"
   ],
-  "homepage":"https://github.com/jippi/cakephp-audit-log",
-  "license":"MIT",
-  "authors":[
+  "homepage": "https://github.com/jippi/cakephp-audit-log",
+  "license": "MIT",
+  "authors": [
     {
-      "name":"Christian Winther",
-      "role":"Author",
-      "homepage":"http://cakephp.nu/"
+      "name": "Christian Winther",
+      "role": "Author",
+      "homepage": "http://cakephp.nu/"
     },
     {
-      "name":"Dlr",
-      "role":"Migration to CakePhp 4",
-      "homepage":"https://www.spotloc.solutions"
+      "name": "Dlr",
+      "role": "Migration to CakePhp 4",
+      "homepage": "https://www.spotloc.solutions"
     }
   ],
-  "require":{
+  "require": {
     "php": ">=7.2",
     "cakephp/cakephp": "^4.0",
-    "phpspec/php-diff":"dev-master"
+    "phpspec/php-diff": "dev-master"
   },
   "require-dev": {
     "phpunit/phpunit": "*"
