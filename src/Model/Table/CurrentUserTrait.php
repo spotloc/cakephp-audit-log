@@ -14,7 +14,7 @@ trait CurrentUserTrait
         $session = $request->getSession();
         $user = $session->read('Auth');
         return [
-            'id'          => $user->username,
+            'id'          => $session->read('Auth.User.username'),
             'ip'          => $request->getEnv('REMOTE_ADDR'),
             'url'         => $request->getRequestTarget(),
             'description' => $session->read('Auth.User.username'),
